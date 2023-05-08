@@ -25,7 +25,7 @@ export const register = async (req: Request, res: Response) => {
             role,
         });
 
-        return res.status(200).json(user).end();
+        return res.status(200).json({ success: true, user }).end();
     } catch (error) {
         logger.error(error, "user register error: ");
         return res.sendStatus(500);
@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
             expiresIn: "3days",
         })
 
-        return res.status(200).json({ token }).end();
+        return res.status(200).json({ success: true, token }).end();
     } catch (error) {
         logger.error(error, "user login error: ");
         return res.sendStatus(500);

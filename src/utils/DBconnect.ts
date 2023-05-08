@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
+import logger from "./logger";
 
 async function DBconnect() {
-    const MongoUri = process.env.MONGO_URI!;
+  const MongoUri = process.env.MONGO_URI!;
 
+  // connect Mongo Database
   try {
     await mongoose.connect(MongoUri);
-    console.log("MongoDB connected");
+    logger.info("MongoDB connected");
   } catch (error) {
-    console.log("Can not connect to DB: ", error);
+    logger.error(error, "Can not connect to DB: ");
   }
 }
 

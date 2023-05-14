@@ -4,10 +4,9 @@ import { createPet, getPets } from "../services/petService";
 
 export const getPetsList = async (req: Request, res: Response) => {
     try {
-
         const pets = await getPets();
 
-        return res.status(200).json({ success: true, pets }).end();
+        return res.status(200).json({ success: true, pets });
     } catch (error) {
         logger.error(error, "create new pet error: ");
         return res.sendStatus(500);
@@ -29,7 +28,7 @@ export const createNewPet = async (req: Request, res: Response) => {
             handleBy: user?._id
         })
 
-        return res.status(200).json({ success: true, pet }).end();
+        return res.status(200).json({ success: true, pet });
     } catch (error) {
         logger.error(error, "create new pet error: ");
         return res.sendStatus(500);

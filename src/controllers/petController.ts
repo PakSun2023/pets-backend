@@ -18,6 +18,8 @@ export const createNewPet = async (req: Request, res: Response) => {
         const { name, age, location, color, breed, petImage } = req.body;
         const user = req.body.user;
 
+        console.log(req.body)
+
         const pet = await createPet({
             name,
             age,

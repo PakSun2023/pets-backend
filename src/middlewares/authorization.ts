@@ -18,7 +18,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
         req.body.user = decoded;
         return next();
     } catch (error: any) {
-        logger.error(error);
+        logger.error(error, "Authorization error: ");
         return res.status(401).json({
             message: "token unauthorized",
         });

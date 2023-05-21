@@ -5,5 +5,5 @@ import upload from '../middlewares/fileUpload';
 
 export default (router: express.Router) => {
     router.get('/pets', getPetsList);
-    router.post('/pet', authorization, upload.single("petPhoto"),  createNewPet);
+    router.post('/pet', upload.single("petPhoto"), authorization, createNewPet);
 }

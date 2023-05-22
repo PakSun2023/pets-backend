@@ -4,6 +4,7 @@ const PetSchema = new mongoose.Schema(
     {
         type: { type: String, default: 'cat' },
         name: { type: String },
+        description: { type: String },
         age: { type: Number },
         location: { type: String },
         breed: { type: String },

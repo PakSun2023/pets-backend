@@ -39,7 +39,7 @@ export const login = async (req: Request, res: Response) => {
         if (!email || !password) return res.status(400).json({message: "Invalid data format!"});
 
         const user = await validatePassword(email, password);
-        if (!user) return res.status(400).json({ message: "Invalid email or password!" });;
+        if (!user) return res.status(400).json({ message: "Invalid email or password!" });
 
         // generate jwt token with expired in 3 days
         const token = jwt.sign(user, JWT_SECRET!, {

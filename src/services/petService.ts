@@ -16,3 +16,6 @@ export const createPet = async (values: Record<string, any>) => {
         logger.error(error, "create pet service error: ");
     }
 };
+
+// delete pet by id
+export const deletePetById = (id: string) => PetModel.findOneAndDelete({ _id: id });

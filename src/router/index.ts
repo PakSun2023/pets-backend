@@ -1,6 +1,7 @@
 import express, { Response } from "express";
 import authRouter from "./authRouter";
 import petRouter from "./petRouter";
+import userRouter from "./userRouter";
 
 const router = express.Router();
 
@@ -15,6 +16,9 @@ export default (): express.Router => {
 
     // router /pet
     petRouter(router);
+
+    // router /user include myFavoriteList
+    userRouter(router);
 
     return router;
 };

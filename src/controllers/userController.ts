@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import logger from "../utils/logger";
 import { getPetById } from "../services/petService";
-import { getMyFavoriteList } from "../services/userService";
+import { createNewMessage, deleteMessageById, getMessageById, getMessagesByPet, getMyFavoriteList, getUserById } from "../services/userService";
 import { MyFavoriteModel } from "../models/myFavorite";
 
 export const getFavoriteList = async (req: Request, res: Response) => {
@@ -86,6 +86,107 @@ export const removePetFromFavoriteList = async (req: Request, res: Response) => 
         }
     } catch (error) {
         logger.error(error, "remove pet from favorite pets list error: ");
+        return res.sendStatus(500);
+    }
+}
+
+export const getMessages = async (req: Request, res: Response) => {
+    try {
+        const petId = req.params.pid;
+        if (!petId) return res.status(400).json({ message: "Invalid pet info!" });
+
+        const msgs: {
+            id: string,
+            user: string,
+            message: string,
+            replyMessage: string,
+            createdAt: string,
+            updatedAt: string,
+        }[] = [];
+
+        const messages = await getMessagesByPet(petId);
+        if (messages && messages.length > 0) {
+            await Promise.all(messages.map(async m => {
+                const user = await getUserById(m.user?._id.toString()!);
+                if (user) {
+                    msgs.push({
+                        id: m._id.toString(),
+                        user: user?.email ?? '',
+                        message: m.message ?? '',
+                        replyMessage: m.replyMessage ?? '',
+                        createdAt: m.createdAt.toDateString() ?? '',
+                        updatedAt: m.updatedAt.toDateString() ?? '',
+                    })
+                }
+            }))
+        }
+
+        return res.status(200).json({ success: true, messages: msgs });
+    } catch (error) {
+        logger.error(error, "get user messages about pet error: ");
+        return res.sendStatus(500);
+    }
+}
+
+export const postMessage = async (req: Request, res: Response) => {
+    try {
+        const petId = req.params.pid;
+        if (!petId) return res.status(400).json({ message: "Invalid pet id!" });
+
+        const { message, user } = req.body;
+
+        const newMessage = await createNewMessage({
+            user: user._id,
+            pet: petId,
+            message: message,
+            replyMessage: '',
+        })
+
+        return res.status(200).json({ success: true, newMessage });
+    } catch (error) {
+        logger.error(error, "post message about pet error: ");
+        return res.sendStatus(500);
+    }
+}
+
+export const replyMessage = async (req: Request, res: Response) => {
+    try {
+        const { message, user } = req.body;
+        if (user?.role !== "staff") {
+            return res.status(400).json({ message: "Permission deny!" });
+        }
+
+        console.log({message})
+
+        const msgId = req.params.mid;
+        if (!msgId) return res.status(400).json({ message: "Invalid message id!" });
+
+        const existMsg = await getMessageById(msgId);
+        if (!existMsg) return res.status(400).json({ message: "Message not found!" });
+
+        existMsg.replyMessage = message;
+        await existMsg.save();
+
+        return res.status(200).json({ success: true, message: existMsg });
+    } catch (error) {
+        logger.error(error, "reply user message error: ");
+        return res.sendStatus(500);
+    }
+}
+
+export const deleteMessage = async (req: Request, res: Response) => {
+    try {
+        const { user } = req.body;
+        if (user?.role !== "staff") {
+            return res.status(400).json({ message: "Permission deny!" });
+        }
+
+        const msgId = req.params.mid;
+        const deletedMsg = await deleteMessageById(msgId);
+
+        return res.status(200).json({ success: true, deletedMsg });
+    } catch (error) {
+        logger.error(error, "reply user message error: ");
         return res.sendStatus(500);
     }
 }

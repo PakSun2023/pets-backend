@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import path from "path";
+import fs from "fs";
 import logger from "../utils/logger";
 import { getPetById } from "../services/petService";
 import { getMyFavoriteList } from "../services/userService";
@@ -9,8 +11,24 @@ export const getFavoriteList = async (req: Request, res: Response) => {
         const { user } = req.body;
 
         const favoriteList = await getMyFavoriteList(user._id);
+        const myList: any[] = [];
+        if (favoriteList && favoriteList.pets.length > 0) {
+            await Promise.all(favoriteList.pets.map(async petId => {
+                const pet = await getPetById(petId.toString());
 
-        return res.status(200).json({ success: true, myFavoriteList: favoriteList });
+                if (pet) {
+                    const petData = pet.toObject();
+                    const imageFolder = path.join(__dirname, '..', 'uploads');
+                    const imageBase64 = pet.petImage && await fs.promises.readFile(imageFolder + `/${pet.petImage}`);
+                    if (imageBase64) {
+                        petData.petImage = imageBase64.toString("base64");
+                    }
+                    myList.push(petData);
+                }
+            }))
+        }
+
+        return res.status(200).json({ success: true, myFavoriteList: myList });
     } catch (error) {
         logger.error(error, "get favorite pets list error: ");
         return res.sendStatus(500);

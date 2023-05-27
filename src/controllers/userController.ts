@@ -37,7 +37,8 @@ export const getFavoriteList = async (req: Request, res: Response) => {
 
 export const addPetToFavoriteList = async (req: Request, res: Response) => {
     try {
-        const { user, petId } = req.body;
+        const petId = req.params.id;
+        const { user } = req.body;
         if (!user || !petId) return res.status(400).json({ message: "Invalid user or pet info!" });
 
         const pet = await getPetById(petId);
@@ -45,7 +46,7 @@ export const addPetToFavoriteList = async (req: Request, res: Response) => {
 
         const existFavoriteList = await getMyFavoriteList(user._id);
         if (existFavoriteList) {
-            existFavoriteList.pets = [...existFavoriteList.pets, petId];
+            existFavoriteList.pets = [...existFavoriteList.pets, pet._id];
             await existFavoriteList.save();
 
             return res.status(200).json({ success: true, myFavoriteList: existFavoriteList });
@@ -65,7 +66,8 @@ export const addPetToFavoriteList = async (req: Request, res: Response) => {
 
 export const removePetFromFavoriteList = async (req: Request, res: Response) => {
     try {
-        const { user, petId } = req.body;
+        const petId = req.params.id;
+        const { user } = req.body;
         if (!user || !petId) return res.status(400).json({ message: "Invalid user or pet info!" });
 
         const pet = await getPetById(petId);
@@ -74,7 +76,7 @@ export const removePetFromFavoriteList = async (req: Request, res: Response) => 
         const existFavoriteList = await getMyFavoriteList(user._id);
         if (existFavoriteList) {
             // remove pet's id from favorite list 
-            const updatedPets = existFavoriteList.pets.filter(pet => pet != petId);
+            const updatedPets = existFavoriteList.pets.filter(p => p.toString() !== pet._id.toString());
             existFavoriteList.pets = updatedPets;
             await existFavoriteList.save();
 

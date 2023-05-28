@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import DBconnect from "./utils/DBconnect";
 import router from "./router";
 import logger from "./utils/logger";
+import swaggerDocs from "./utils/swagger";
 
 dotenv.config();
 
@@ -21,4 +22,6 @@ app.listen(8080, async () => {
   logger.info('Server is running at http://localhost:8080/');
 
   await DBconnect();
+
+  swaggerDocs(app, 8080);
 });

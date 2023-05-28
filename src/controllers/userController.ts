@@ -156,8 +156,6 @@ export const replyMessage = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Permission deny!" });
         }
 
-        console.log({message})
-
         const msgId = req.params.mid;
         if (!msgId) return res.status(400).json({ message: "Invalid message id!" });
 
